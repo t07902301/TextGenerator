@@ -353,10 +353,25 @@ def parse_arguments():
     parser.add_argument(
         "-ns",
         "--noise",
-        type=float,
+        type=int,
         nargs="?",
         default=0,
         help="Define what kind of noise added to the image. 0:None, 1: Gaussian, 2: salt-pepper"
+    )
+    parser.add_argument(
+        "-ms",
+        "--mask",
+        type=bool,
+        nargs="?",
+        default=False,
+        help="Whether to add mask or not"
+    )
+    parser.add_argument(
+        "-msd",
+        "--mask_dir",
+        type=str,
+        nargs="?",
+        default=os.path.join(os.path.split(os.path.realpath(__file__))[0], "images/mask"),
     )
     return parser.parse_args()
 
@@ -443,6 +458,7 @@ def main():
         strings = [x.upper() for x in strings]
     if args.case == "lower":
         strings = [x.lower() for x in strings]
+    
 
     string_count = len(strings)
     font_dict = {}
@@ -497,9 +513,13 @@ def main():
 
     fonts_num=len(fonts)
     images = os.listdir(args.image_dir)
+    mask_images=os.listdir(args.mask_dir)
     img_list=[]
+    mask_image_list=[]
     for img in images:
-        img_list.append(os.path.join(args.image_dir,img))
+        img_list.append(os.path.join(args.image_dir,img))   
+    for mask in mask_images:
+        mask_image_list.append(os.path.join(args.mask_dir,mask))
     for i in tqdm(range(string_count)):
         font_index=i%fonts_num # fonts[rnd.randrange(0, len(fonts))]
         FakeTextDataGenerator.generate(i, strings[i], fonts[font_index], args.output_dir, args.format, args.extension,
@@ -507,7 +527,7 @@ def main():
                                                             args.distorsion, args.distorsion_orientation, args.handwritten, args.name_format,
                                                             args.width, args.alignment, args.text_color, args.orientation, args.space_width,
                                                             args.character_spacing, args.margins, args.fit, args.output_mask, args.word_split,
-                                                            img_list, args.stroke_width, args.stroke_fill, args.image_mode, args.name_pre,font_dict,args.light_degree,args.noise)
+                                                            img_list, args.stroke_width, args.stroke_fill, args.image_mode, args.name_pre,font_dict,args.light_degree,args.noise,mask_image_list,args.mask)
     # p.close()
     # p.join()
     if args.name_format == 2:

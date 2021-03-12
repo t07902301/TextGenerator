@@ -56,7 +56,9 @@ class FakeTextDataGenerator(object):
         name_pre='',
         font_dict={},
         light_degree=0,
-        noise_type=0
+        noise_type=0,
+        mask_image_list=[],
+        has_mask=False,
     ):
         image = None
         # print(margins)
@@ -188,7 +190,11 @@ class FakeTextDataGenerator(object):
         background_mask = Image.new(
             "RGB", (background_width, background_height), (0, 0, 0)
         )
-
+        ##############
+        # Add mask #
+        ##############
+        if has_mask:
+            background_img=background_generator.add_mask(background_img,mask_image_list,index)
         #############################
         # Place text with alignment #
         #############################

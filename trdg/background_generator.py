@@ -162,3 +162,38 @@ def gen_rand_bg(height, width, is_bgr=True):
     if is_bgr:
         bg = cv2.cvtColor(bg, cv2.COLOR_GRAY2BGR)
     return Image.fromarray(bg).convert("RGBA")
+def add_mask(img,mask_img_list,index):
+    degree=0.4 # Degree of mask
+    mask_index=index%len(mask_img_list)
+    mask_img=Image.open(mask_img_list[mask_index])
+    # Resize images and mask images to the same scale
+    width=min(mask_img.size[0],img.size[0])
+    height=min(mask_img.size[1],img.size[1])
+    mask_img=mask_img.resize((width,height))
+    img=img.resize((width,height))
+    mask_img=np.array(mask_img)
+    img=np.array(img)
+    if mask_img.shape[2]==3:
+        mask_img=cv2.cvtColor(mask_img,cv2.COLOR_RGB2RGBA)
+    if img.shape[2]==3:
+        img=cv2.cvtColor(img,cv2.COLOR_RGB2RGBA)
+    mask_img=mask_img/255
+    img=img/255
+    # Choose the point where the mask begin.
+    # If the start point is 0, the whole image will be pasted with mask.
+    # If the start point is bigger than 0, mask will extend to two directions along the axis 0. 
+    mask_start_slot=random.randint(0,5)
+    # Construct the array of masking each line, and then move the `line mask` to build a complete mask.
+    if mask_start_slot==0:
+        line_mask=np.repeat(degree,mask_img.shape[1])
+    else:
+        start_point=int(mask_img.shape[1]/mask_start_slot)
+        line_mask_1=np.linspace(0,degree,start_point)
+        line_mask_2=np.linspace(degree,0,mask_img.shape[1]-start_point)
+        line_mask=np.concatenate((line_mask_1,line_mask_2))
+    # Generate blend masks, here: linear, horizontal fading from 1 to 0 and from 0 to 1
+    mask = np.repeat(np.tile(line_mask, (mask_img.shape[0], 1))[:, :, np.newaxis], 4, axis=2)
+    final=mask_img*mask+img
+    final=np.clip(final,0,1)
+    final=np.uint8(final*255)
+    return Image.fromarray(final,mode='RGBA')      

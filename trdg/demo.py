@@ -206,38 +206,59 @@ image=Image.open('images/city.jpg')
 # print(np.arra)
 # gauss_noise_customized(image).show()
 
-import cv2
-import numpy as np
+# import cv2
+# import numpy as np
 
 # Some input images
-img1 = cv2.resize(cv2.imread('images/city.jpg'), (400, 300))
-img2 = cv2.resize(cv2.imread('images/yyzz/b3.png'), (400, 300))
-# print(img1.shape)
-img1=img1/255
-img2=img2/255
-mask_line=np.repeat(0.3,img1.shape[1])
+mask_img=Image.open('images/mask/2.png')
+img=Image.open('images/yyzz/b3.png')
+width=min(mask_img.size[0],img.size[0])
+height=min(mask_img.size[1],img.size[1])
+# mask_img=mask_img.resize((width,height))
+# img=img.resize((width,height))
+img=img.resize((200,100))
+mask_img=mask_img.resize((200,100))
+
+# mask_img = cv2.resize(cv2.imread('images/city.jpg'), (400, 300))
+# img = cv2.resize(cv2.imread('images/yyzz/b3.png'), (400, 300))
+# print(mask_img.shape)
+mask_img=np.array(mask_img)
+img=np.array(img)
+if mask_img.shape[2]==3:
+    mask_img=cv2.cvtColor(mask_img,cv2.COLOR_RGB2RGBA)
+if img.shape[2]==3:
+    img=cv2.cvtColor(img,cv2.COLOR_RGB2RGBA)
+mask_img=mask_img/255
+img=img/255
+print(mask_img.shape,img.shape)
+left_line=np.linspace(0,0.3,int(mask_img.shape[1]/2))
+right_lie=np.linspace(0.3,0,int(mask_img.shape[1]/2))
+
+mask_line=np.concatenate((left_line,right_lie))
 # Generate blend masks, here: linear, horizontal fading from 1 to 0 and from 0 to 1
-# mask1 = np.repeat(np.tile(np.linspace(0.1, 0.3, img1.shape[1]), (img1.shape[0], 1))[:, :, np.newaxis], 3, axis=2)
-mask1 = np.repeat(np.tile(mask_line, (img1.shape[0], 1))[:, :, np.newaxis], 3, axis=2)
-# mask2 = np.repeat(np.tile(np.linspace(0, 1, img2.shape[1]), (img2.shape[0], 1))[:, :, np.newaxis], 3, axis=2)
+# mask1 = np.repeat(np.tile(np.linspace(0.1, 0.3, mask_img.shape[1]), (mask_img.shape[0], 1))[:, :, np.newaxis], 3, axis=2)
+mask1 = np.repeat(np.tile(mask_line, (mask_img.shape[0], 1))[:, :, np.newaxis], 4, axis=2)
+# mask2 = np.repeat(np.tile(np.linspace(0, 1, img.shape[1]), (img.shape[0], 1))[:, :, np.newaxis], 3, axis=2)
 # print(mask1.shape)
 
-cv2.imshow('mask1', mask1)
-final=img1*mask1+img2
+# cv2.imshow('mask1', mask1)
+
+final=mask_img*mask1+img
 final=np.clip(final,0,1)
 final=np.uint8(final*255)
+Image.fromarray(final).show()
 # cv2.imshow('mask2', mask2)
 # # Generate output by linear blending
-# final = np.uint8(img1 * mask1)
+# final = np.uint8(mask_img * mask1)
 
 # # Outputs
-# # cv2.imshow('img1', img1)
-# # cv2.imshow('img2', img2)
+# # cv2.imshow('mask_img', mask_img)
+# # cv2.imshow('img', img)
 # # cv2.imshow('mask1', mask1)
 # # cv2.imshow('mask2', mask2)
-cv2.imshow('final', final)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow('final', final)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
 
 # width,height=img_rgba.size
