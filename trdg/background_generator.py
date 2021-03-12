@@ -163,7 +163,7 @@ def gen_rand_bg(height, width, is_bgr=True):
         bg = cv2.cvtColor(bg, cv2.COLOR_GRAY2BGR)
     return Image.fromarray(bg).convert("RGBA")
 def add_mask(img,mask_img_list,index):
-    degree=0.4 # Degree of mask
+    degree=0.4 # Degree of mask 
     mask_index=index%len(mask_img_list)
     mask_img=Image.open(mask_img_list[mask_index])
     # Resize images and mask images to the same scale

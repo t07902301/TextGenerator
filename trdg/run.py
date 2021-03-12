@@ -7,7 +7,7 @@ from fontTools.ttLib import TTCollection
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import random as rnd
-import string
+import string 
 import sys
 
 from tqdm import tqdm

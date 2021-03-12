@@ -6,7 +6,7 @@ from PIL import Image, ImageFilter
 from trdg import computer_text_generator, background_generator, distorsion_generator
 from trdg.fonts.judge_char_in_font import judge_char_in_font1, judge_char_in_font2
 
-try:
+try: 
     from trdg import handwritten_text_generator
 except ImportError as e:
     print("Missing modules for handwritten text generation.")
